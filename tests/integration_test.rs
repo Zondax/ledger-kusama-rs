@@ -25,7 +25,6 @@ extern crate sha2;
 #[macro_use]
 extern crate serial_test;
 extern crate ledger_substrate;
-#[macro_use] extern crate log;
 
 #[cfg(test)]
 mod integration_tests {
@@ -238,7 +237,16 @@ mod integration_tests {
         let serialized_allowlist = generate_example_allowlist();
         let _ = app.allowlist_upload(&serialized_allowlist[..]).await.unwrap();
 
+        let allowlist_digest = app.allowlist_get_hash().await.unwrap();
+        assert_eq!(
+            hex::encode(allowlist_digest),
+            "00882f4bccca326f0e181c13ab014d73c5ae826a2f15a26d204a7f34dfea21b7"
+        );
+
         // Try a couple of stake nominations
         // FIXME: add two examples
+        // This nomination targets HFfvSuhgKycuYVk5YnxdDTmpDnjWsnT76nks8fryfSLaD96
+        let nominate_tx = "060504cef4313d2d72d949a1b35cd6ffd68bd6fcf5524dd0923fb94d23eaf69a01e888d503ae1103008ed73e0ddc07000001000000b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafeb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe";
+
     }
 }
