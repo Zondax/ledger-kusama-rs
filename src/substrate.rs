@@ -20,10 +20,12 @@
 #![deny(missing_docs)]
 
 use ledger_transport::{APDUCommand, APDUErrorCodes, APDUTransport};
-use ledger_zondax_generic::{AppInfo, ChunkPayloadType, DeviceInfo, Version, LedgerAppError, map_apdu_error_description};
+use ledger_zondax_generic::{
+    map_apdu_error_description, AppInfo, ChunkPayloadType, DeviceInfo, LedgerAppError, Version,
+};
+use log::info;
 use std::str;
 use zx_bip44::BIP44Path;
-use log::info;
 
 const INS_GET_ADDR_ED25519: u8 = 0x01;
 const INS_SIGN_ED25519: u8 = 0x02;
@@ -134,7 +136,11 @@ impl SubstrateApp {
     }
 
     /// Sign a transaction. The returned `[u8; 65]` is a SCALE-encoded MultiSignature.
-    pub async fn sign(&self, path: &BIP44Path, message: &[u8]) -> Result<Signature, LedgerAppError> {
+    pub async fn sign(
+        &self,
+        path: &BIP44Path,
+        message: &[u8],
+    ) -> Result<Signature, LedgerAppError> {
         let serialized_path = path.serialize();
         let start_command = APDUCommand {
             cla: self.cla,
@@ -214,9 +220,7 @@ impl SubstrateApp {
                 Ok(())
             }
 
-            Err(e) => {
-                Err(LedgerAppError::TransportError(e))
-            }
+            Err(e) => Err(LedgerAppError::TransportError(e)),
         }
     }
 

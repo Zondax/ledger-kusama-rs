@@ -28,15 +28,15 @@ extern crate ledger_substrate;
 
 #[cfg(test)]
 mod integration_tests {
-    use blake2b_simd::Params;
     use crate::ed25519_dalek::ed25519::signature::Signature;
     use crate::ed25519_dalek::Verifier;
+    use blake2b_simd::Params;
     use ed25519_dalek::PublicKey;
+    use env_logger::Env;
     use futures_await_test::async_test;
     use ledger_substrate::{new_kusama_app, APDUTransport, AppMode};
     use std::convert::TryInto;
     use zx_bip44::BIP44Path;
-    use env_logger::Env;
 
     fn init_logging() {
         let _ = env_logger::from_env(Env::default().default_filter_or("info"))
@@ -213,7 +213,12 @@ mod integration_tests {
             .finalize();
 
         let signature = esk.sign(&digest.as_bytes(), &pk);
-        [&allowlist_len_bytes, &signature.to_bytes()[..], &address_vec.as_slice()].concat()
+        [
+            &allowlist_len_bytes,
+            &signature.to_bytes()[..],
+            &address_vec.as_slice(),
+        ]
+        .concat()
     }
 
     #[async_test]
@@ -235,29 +240,25 @@ mod integration_tests {
         }
 
         // We try to set the pubkey, it is possible that it was been set already, we ignore the error here:
-        let some_pk: [u8; 32] = hex::decode(SOME_PK)
-            .unwrap()
-            .as_slice()
-            .try_into()
-            .unwrap();
+        let some_pk: [u8; 32] = hex::decode(SOME_PK).unwrap().as_slice().try_into().unwrap();
         let _ = app.allowlist_set_pubkey(&some_pk).await;
 
         // Let's get the pubkey back to be sure it is fine
         let resp_get = app.allowlist_get_pubkey().await.unwrap();
         assert_eq!(resp_get.len(), 32);
-        assert_eq!(
-            hex::encode(resp_get),
-            SOME_PK
-        );
+        assert_eq!(hex::encode(resp_get), SOME_PK);
 
         // Now upload the allowlist
-        let addresses = vec!(
+        let addresses = vec![
             "FQr6vFmm8zNFV9m4ZMxKzMdUVUbPtrhxxaVkAybHxsDYMCY",
-            "HXAjzUP15goNbAkujFgnNcioHhUGMDMSRdfbSxi11GsCBV6"
-        );
+            "HXAjzUP15goNbAkujFgnNcioHhUGMDMSRdfbSxi11GsCBV6",
+        ];
         let sk = hex::decode(SOME_SK).unwrap();
         let serialized_allowlist = generate_allowlist(addresses, sk);
-        let _ = app.allowlist_upload(&serialized_allowlist[..]).await.unwrap();
+        let _ = app
+            .allowlist_upload(&serialized_allowlist[..])
+            .await
+            .unwrap();
 
         let allowlist_digest = app.allowlist_get_hash().await.unwrap();
         assert_eq!(
@@ -313,7 +314,7 @@ mod integration_tests {
         let response2 = app.sign(&path, &blob2).await;
         assert!(response2.is_err());
 
-        let err =response2.err().unwrap();
+        let err = response2.err().unwrap();
         log::info!("{:?}", err)
     }
 }
