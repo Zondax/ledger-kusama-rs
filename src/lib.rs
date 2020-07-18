@@ -18,10 +18,10 @@
 #![cfg_attr(
     not(test),
     deny(
-        clippy::option_unwrap_used,
-        clippy::option_expect_used,
-        clippy::result_unwrap_used,
-        clippy::result_expect_used,
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::unwrap_used,
+        clippy::expect_used,
     )
 )]
 #![deny(warnings, trivial_casts, trivial_numeric_casts)]
@@ -40,6 +40,8 @@ pub use ledger_transport::{APDUAnswer, APDUCommand, APDUErrorCodes, APDUTranspor
 pub use ledger_zondax_generic::LedgerAppError;
 /// Substrate app
 pub use substrate::SubstrateApp;
+
+pub use substrate::AppMode;
 
 const CLA_POLKADOT: u8 = 0x90;
 const CLA_KUSAMA: u8 = 0x99;

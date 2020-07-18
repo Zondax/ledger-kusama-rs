@@ -41,6 +41,16 @@ pub struct SubstrateApp {
     pub(crate) cla: u8,
 }
 
+/// Ledger application mode
+pub enum AppMode {
+    /// Standard Mode - Normal App
+    Standard = 0,
+    /// Testing Mode - Only for testing purposes
+    Testing = 1,
+    /// Restricted Mode - Ledgeracio Variant
+    Ledgeracio = 2,
+}
+
 type PublicKey = [u8; PK_LEN];
 
 type AllowlistHash = [u8; 32];
