@@ -32,16 +32,14 @@
 mod substrate;
 
 pub use ledger_transport::errors::TransportError;
-#[cfg(target_arch = "wasm32")]
-pub use ledger_transport::TransportWrapperTrait;
 pub use ledger_transport::{APDUAnswer, APDUCommand, APDUErrorCodes, APDUTransport};
 
 /// Ledger related errors
 pub use ledger_zondax_generic::LedgerAppError;
 /// Substrate app
-pub use substrate::SubstrateApp;
+pub use substrate::{Allowlist, AppMode, SubstrateApp};
 
-pub use substrate::AppMode;
+//use ledger_transport::Exchange;
 
 const CLA_POLKADOT: u8 = 0x90;
 const CLA_KUSAMA: u8 = 0x99;

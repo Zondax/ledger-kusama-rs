@@ -34,7 +34,7 @@ mod integration_tests {
     use ed25519_dalek::PublicKey;
     use env_logger::Env;
     use futures_await_test::async_test;
-    use ledger_substrate::{new_kusama_app, APDUTransport, AppMode, SubstrateApp};
+    use ledger_substrate::{new_kusama_app, APDUTransport, Allowlist, AppMode};
     use std::convert::TryInto;
     use zx_bip44::BIP44Path;
 
@@ -49,9 +49,7 @@ mod integration_tests {
     async fn version() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let resp = app.get_version().await.unwrap();
@@ -71,9 +69,7 @@ mod integration_tests {
     async fn address() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let path = BIP44Path::from_string("m/44'/434'/0'/0'/5'").unwrap();
@@ -95,9 +91,7 @@ mod integration_tests {
     async fn show_address() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let path = BIP44Path::from_string("m/44'/434'/0'/0'/5'").unwrap();
@@ -119,9 +113,7 @@ mod integration_tests {
     async fn sign_empty() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let path = BIP44Path::from_string("m/44'/434'/0'/0'/5'").unwrap();
@@ -140,9 +132,7 @@ mod integration_tests {
     async fn sign_verify() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let app_version = app.get_version().await.unwrap();
@@ -198,7 +188,7 @@ mod integration_tests {
 
         let sk = hex::decode(SOME_SK).unwrap();
         let esk = ed25519_dalek::ExpandedSecretKey::from_bytes(&sk).unwrap();
-        let allowlist = SubstrateApp::generate_allowlist(0, addresses, esk).unwrap();
+        let allowlist = Allowlist::generate_allowlist(0, addresses, esk).unwrap();
 
         assert_eq!(
             hex::encode(allowlist.digest),
@@ -211,9 +201,7 @@ mod integration_tests {
     async fn allowlist_upload() {
         init_logging();
 
-        let transport = APDUTransport {
-            transport_wrapper: ledger::TransportNativeHID::new().unwrap(),
-        };
+        let transport = APDUTransport::new(ledger::TransportNativeHID::new().unwrap());
         let app = new_kusama_app(transport);
 
         let app_version = app.get_version().await.unwrap();
@@ -240,7 +228,7 @@ mod integration_tests {
         ];
         let sk = hex::decode(SOME_SK).unwrap();
         let esk = ed25519_dalek::ExpandedSecretKey::from_bytes(&sk).unwrap();
-        let allowlist = SubstrateApp::generate_allowlist(1, addresses, esk).unwrap();
+        let allowlist = Allowlist::generate_allowlist(1, addresses, esk).unwrap();
 
         let _ = app.allowlist_upload(&allowlist.blob[..]).await.unwrap();
 
